@@ -1,0 +1,98 @@
+install : conda install pytorch=1.1.0 torchvision cudatoolkit=10.0 -c pytorch
+
+Lee server 
+ln -s /disk2/waiyu-data/coco/annotations datasets/coco/annotations
+ln -s /disk2/waiyu-data/coco/train2014 datasets/coco/train2014
+ln -s /disk2/waiyu-data/coco/test2014 datasets/coco/test2014
+ln -s /disk2/waiyu-data/coco/val2014 datasets/coco/val2014
+vision5 data_path: /data/waiyu-data/
+vision2 data_path: /disk2/waiyu-data
+
+
+gcloud : 
+ln -s ~/datasets/coco/annotations datasets/coco/annotations
+ln -s ~/datasets/coco/train2014 datasets/coco/train2014
+ln -s ~/datasets/coco/test2014 datasets/coco/test2014
+ln -s ~/datasets/coco/val2014 datasets/coco/val2014
+data_path: ~/datasets/
+
+Troubleshooting :
+1. Remember remove the build and compile setup.sh again whenever install new pytorch/cuda version :
+	rm -rf build
+	python setup.py build develop 
+
+Debug :
+python -m pdb tools/train_net.py --config-file "configs/my_amodal_mask_rcnn_R_50_FPN_1x.yaml" 
+Train: 
+python tools/train_net.py --config-file "configs/my_amodal_mask_rcnn_R_50_FPN_1x.yaml" 
+python tools/train_net.py --config-file "configs/my_mask_rcnn_R_50_FPN_1x.yaml" OUTPUT_DIR "Amodal_no_occulusion"
+
+Test: 
+python tools/test_net.py --config-file "configs/my_amodal_mask_rcnn_R_50_FPN_1x.yaml" 
+python tools/test_net.py --config-file "configs/my_mask_rcnn_R_50_FPN_1x.yaml" OUTPUT_DIR "Amodal_noFT"
+
+Tensorflow: 
+tensorboard --logdir logs/log_file_name
+
+maskrcnn_benchmark/modeling/rpn/inference.py
+
+b /home/waiyu/Amodal_maskrcnn/maskrcnn_benchmark/modeling/rpn/loss.py:135
+
+The bug appears in : 
+def _forward_train(self, anchors, objectness, rpn_box_regression, targets):
+        if self.cfg.MODEL.RPN_ONLY:
+            # When training an RPN-only model, the loss is determined by the
+            # predicted objectness and rpn_box_regression values and there is
+            # no need to transform the anchors into predicted boxes; this is an
+            # optimization that avoids the unnecessary transformation.
+            boxes = anchors
+        else:
+            # For end-to-end models, anchors must be transformed into boxes and
+            # sampled into a training batch.
+            with torch.no_grad():
+                boxes = self.box_selector_train(
+                    anchors, objectness, rpn_box_regression, targets
+                )
+
+# boxes = self.box_selector_train( anchors, objectness, rpn_box_regression, targets )
+# inference.py 
+(Pdb) p topk_idx.shape
+torch.Size([2, 2000])
+(Pdb) p topk_idx
+THCudaCheck FAIL file=../aten/src/THC/THCCachingHostAllocator.cpp line=265 error=59 : device-side assert triggered
+
+Solution : for now, we are using the self.cfg.MODEL.RPN_ONLY training . Bug still need to fixed 
+
+
+Debug : 
+    boxes = self.box_selector_test(anchors, objectness, rpn_box_regression)
+	boxes = self.box_selector_train(anchors, objectness, rpn_box_regression, targets)
+	Fixed : forward_for_single_feature_map() in inference.py 
+
+Modify pretrain models keys: 
+python -m pdb tools/trim_detectron_model.py --cfg "configs/my_amodal_mask_rcnn_R_50_FPN_1x.yaml" 
+python tools/trim_detectron_model.py --cfg "configs/my_amodal_mask_rcnn_R_50_FPN_1x.yaml" 
+
+Duplicate the  'rpn.head.conv.bias' and 'rpn.head.conv.weight' for 3 more classes .
+
+RuntimeError: Error(s) in loading state_dict for GeneralizedRCNN:
+        size mismatch for rpn.head.cls_logits.weight: copying a param with shape torch.Size([3, 256, 1, 1]) from checkpoint, the shape in current model is torch.Size([9, 256, 1, 1]).
+        size mismatch for rpn.head.cls_logits.bias: copying a param with shape torch.Size([3]) from checkpoint, the shape in current model is torch.Size([9]).
+
+/opt/anaconda3/envs/maskrcnn_benchmark/lib/python3.7/site-packages/sklearn/metrics/classification.py:1439: UndefinedMetricWarning: Recall is ill-defined and being set to 0.0 due to no true samples.
+  'recall', 'true', average, warn_for)
+
+
+
+
+
+
+
+
+
+tensor([-1,  0, -2, -2, -1, -2, -2, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+        -1, -2, -1, -1, -1, -1, -2, -1, -1, -1, -2, -1, -2, -1, -1, -1, -1, -1,
+        -1, -1, -1, -1, -2, -1, -1, -1, -1, -1, -2, -1, -1, -1, -2, -1, -2, -1,
+        -1, -2, -1, -2, -1, -2, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+        -1, -1, -1, -1, -2, -1, -1, -1, -2, -1, -1, -1, -2, -1, -1, -1, -1, -2,
+        -1, -1, -1, -1, -1, -1, -1, -2, -1, -1])
