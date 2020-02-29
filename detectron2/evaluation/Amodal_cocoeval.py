@@ -77,6 +77,37 @@ class AMODALCOCOeval (COCOeval):
             for ann in anns:
                 rle = visibleToRLE(ann,coco)
                 ann['visible_mask'] = rle
+        
+        def invisibleToRLE(ann,coco):
+            """
+            Convert annotation which can be polygons, uncompressed RLE to RLE.
+            :return: binary mask (numpy 2D array)
+            """
+            t = coco.imgs[ann['image_id']]
+            h, w = t['height'], t['width']
+            segm = anno.get("invisible_mask", None)
+            if segm:
+                segm = ann['invisible_mask']
+            else:
+                segm = [[0.0, 0.0, 0.0, 0.0, 0.0,0.0]]    
+            if type(segm) == list:
+                # polygon -- a single object might consist of multiple parts
+                # we merge all parts into one mask rle code
+                rles = maskUtils.frPyObjects(segm, h, w)
+                rle = maskUtils.merge(rles)
+            elif type(segm['counts']) == list:
+                # uncompressed RLE
+                rle = maskUtils.frPyObjects(segm, h, w)
+            else:
+                # rle
+                rle = ann['invisible_mask']
+            return rle
+        
+        def _toInvisibleMask(anns, coco):
+            # modify ann['segmentation'] by reference
+            for ann in anns:
+                rle = invisibleToRLE(ann,coco)
+                ann['invisible_mask'] = rle
     
         p = self.params
         if p.useCats:
@@ -93,6 +124,9 @@ class AMODALCOCOeval (COCOeval):
         if p.iouType == 'visible':
             _toVisibleMask(gts, self.cocoGt)
             _toVisibleMask(dts, self.cocoDt)
+        if p.iouType == 'invisible':
+            _toInvisibleMask(gts, self.cocoGt)
+            _toInvisibleMask(dts, self.cocoDt)
         
         # set ignore flag
         for gt in gts:
@@ -129,7 +163,7 @@ class AMODALCOCOeval (COCOeval):
         # loop through images, area range, max detection number
         catIds = p.catIds if p.useCats else [-1]
 
-        if p.iouType == 'segm' or p.iouType == 'bbox' or p.iouType == 'visible':
+        if p.iouType == 'segm' or p.iouType == 'bbox' or p.iouType == 'visible' or p.iouType == 'invisible':
             computeIoU = self.computeIoU
         elif p.iouType == 'keypoints':
             computeIoU = self.computeOks
@@ -172,6 +206,9 @@ class AMODALCOCOeval (COCOeval):
         elif p.iouType == 'bbox':
             g = [g['bbox'] for g in gt]
             d = [d['bbox'] for d in dt]
+        elif p.iouType == 'invisible':
+            g = [g['invisible_mask'] for g in gt]
+            d = [d['invisible_mask'] for d in dt]
         else:
             raise Exception('unknown iouType for iou computation')
 
@@ -179,6 +216,7 @@ class AMODALCOCOeval (COCOeval):
         iscrowd = [int(o['iscrowd']) for o in gt]
         ious = maskUtils.iou(d,g,iscrowd)
         return ious
+    
     def summarize(self):
         '''
         Compute and display summary metrics for evaluation results.
@@ -246,7 +284,7 @@ class AMODALCOCOeval (COCOeval):
         if not self.eval:
             raise Exception('Please run accumulate() first')
         iouType = self.params.iouType
-        if iouType == 'segm' or iouType == 'bbox' or iouType == 'visible':
+        if iouType == 'segm' or iouType == 'bbox' or iouType == 'visible' or iouType == 'invisible':
             summarize = _summarizeDets
         elif iouType == 'keypoints':
             summarize = _summarizeKps

@@ -90,6 +90,7 @@ class AmodalEvaluator(DatasetEvaluator):
         if cfg.MODEL.MASK_ON:
             tasks = tasks + ("segm",)
             tasks = tasks + ("visible",)
+            tasks = tasks + ("invisible",)
         if cfg.MODEL.KEYPOINT_ON:
             tasks = tasks + ("keypoints",)
         return tasks
@@ -248,6 +249,7 @@ class AmodalEvaluator(DatasetEvaluator):
             "bbox": ["AP", "AP50", "AP75", "APs", "APm", "APl"],
             "segm": ["AP", "AP50", "AP75", "APs", "APm", "APl"],
             "visible": ["AP", "AP50", "AP75", "APs", "APm", "APl"],
+            "invisible": ["AP", "AP50", "AP75", "APs", "APm", "APl"],
             "keypoints": ["AP", "AP50", "AP75", "APm", "APl"],
         }[iou_type]
 
@@ -337,7 +339,7 @@ def instances_to_coco_json(instances, img_id):
             rle["counts"] = rle["counts"].decode("utf-8")
     
     has_visible_mask = instances.has("pred_visible_masks")
-    if has_mask:
+    if has_visible_mask:
         # use RLE to encode the masks, because they are too large and takes memory
         # since this evaluator stores outputs of the entire dataset
         vrles = [
@@ -345,6 +347,21 @@ def instances_to_coco_json(instances, img_id):
             for mask in instances.pred_visible_masks
         ]
         for rle in vrles:
+            # "counts" is an array encoded by mask_util as a byte-stream. Python3's
+            # json writer which always produces strings cannot serialize a bytestream
+            # unless you decode it. Thankfully, utf-8 works out (which is also what
+            # the pycocotools/_mask.pyx does).
+            rle["counts"] = rle["counts"].decode("utf-8")
+    
+    has_invisible_mask = instances.has("pred_invisible_masks")
+    if has_invisible_mask:
+        # use RLE to encode the masks, because they are too large and takes memory
+        # since this evaluator stores outputs of the entire dataset
+        ivrles = [
+            mask_util.encode(np.array(mask[:, :, None], order="F", dtype="uint8"))[0]
+            for mask in instances.pred_invisible_masks
+        ]
+        for rle in ivrles:
             # "counts" is an array encoded by mask_util as a byte-stream. Python3's
             # json writer which always produces strings cannot serialize a bytestream
             # unless you decode it. Thankfully, utf-8 works out (which is also what
@@ -367,6 +384,8 @@ def instances_to_coco_json(instances, img_id):
             result["segmentation"] = rles[k]
         if has_visible_mask:
             result["visible_mask"] = vrles[k]
+        if has_invisible_mask:
+            result["invisible_mask"] = ivrles[k]
             
         if has_keypoints:
             # In COCO annotations,
@@ -507,6 +526,15 @@ def _evaluate_predictions_on_coco(coco_gt, coco_results, iou_type, kpt_oks_sigma
             c.pop("bbox", None)
     
     if iou_type == "visible":
+        coco_results = copy.deepcopy(coco_results)
+        # When evaluating mask AP, if the results contain bbox, cocoapi will
+        # use the box area as the area of the instance, instead of the mask area.
+        # This leads to a different definition of small/medium/large.
+        # We remove the bbox field to let mask AP use mask area.
+        for c in coco_results:
+            c.pop("bbox", None)
+    
+    if iou_type == "invisible":
         coco_results = copy.deepcopy(coco_results)
         # When evaluating mask AP, if the results contain bbox, cocoapi will
         # use the box area as the area of the instance, instead of the mask area.
