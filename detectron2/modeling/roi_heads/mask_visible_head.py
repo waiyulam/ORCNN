@@ -228,7 +228,7 @@ class VisibleMaskRCNNConvUpsampleHead(BaseMaskRCNNHead):
             return {"loss_visible_mask": visible_mask_rcnn_loss(x, instances, self.vis_period)},x
         else:
             visible_mask_rcnn_inference(x, instances)
-            return instances
+            return instances,x
 
 
 def build_visible_mask_head(cfg, input_shape):

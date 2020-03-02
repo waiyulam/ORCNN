@@ -187,8 +187,16 @@ Category ids in annotations are not in [1, #categories]! We'll apply a mapping f
                         num_instances_without_valid_i_mask += 1
                         continue  # ignore this instance
                 obj["invisible_mask"] = i_mask
-                
-                
+#             else:
+#                 i_mask = [[0.0,0.0,0.0,0.0,0.0,0.0]]
+#                 if not isinstance(i_mask, dict):
+#                     # filter out invalid polygons (< 3 points)
+#                     i_mask = [poly for poly in i_mask if len(poly) % 2 == 0 and len(poly) >= 6]
+#                     if len(i_mask) == 0:
+#                         num_instances_without_valid_i_mask += 1
+#                         continue  # ignore this instance
+#                 obj["invisible_mask"] = i_mask
+                            
             keypts = anno.get("keypoints", None)
             if keypts:  # list[int]
                 for idx, v in enumerate(keypts):

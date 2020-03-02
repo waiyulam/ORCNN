@@ -319,7 +319,7 @@ class Visualizer:
         )
         self._instance_mode = instance_mode
 
-    def draw_instance_predictions(self, predictions):
+    def draw_instance_predictions(self, predictions,segm ='pred_masks'):
         """
         Draw instance-level prediction results on an image.
 
@@ -337,9 +337,16 @@ class Visualizer:
         labels = _create_text_labels(classes, scores, self.metadata.get("thing_classes", None))
         keypoints = predictions.pred_keypoints if predictions.has("pred_keypoints") else None
 
-        if predictions.has("pred_masks"):
-            masks = np.asarray(predictions.pred_masks)
-            masks = [GenericMask(x, self.output.height, self.output.width) for x in masks]
+        if predictions.has(segm):
+            if segm == 'pred_masks':
+                masks = np.asarray(predictions.pred_masks)
+                masks = [GenericMask(x, self.output.height, self.output.width) for x in masks]
+            elif segm == 'pred_invisible_masks':
+                masks = np.asarray(predictions.pred_invisible_masks)
+                masks = [GenericMask(x, self.output.height, self.output.width) for x in masks]
+            elif segm == 'pred_visible_masks':
+                masks = np.asarray(predictions.pred_visible_masks)
+                masks = [GenericMask(x, self.output.height, self.output.width) for x in masks]
         else:
             masks = None
 
@@ -353,10 +360,21 @@ class Visualizer:
             alpha = 0.5
 
         if self._instance_mode == ColorMode.IMAGE_BW:
-            assert predictions.has("pred_masks"), "ColorMode.IMAGE_BW requires segmentations"
-            self.output.img = self._create_grayscale_image(
-                (predictions.pred_masks.any(dim=0) > 0).numpy()
-            )
+            if segm == 'pred_masks':  
+                assert predictions.has("pred_masks"), "ColorMode.IMAGE_BW requires segmentations"
+                self.output.img = self._create_grayscale_image(
+                    (predictions.pred_masks.any(dim=0) > 0).numpy()
+                )
+            elif segm == 'pred_invisible_masks':
+                assert predictions.has("pred_invisible_masks"), "ColorMode.IMAGE_BW requires segmentations"
+                self.output.img = self._create_grayscale_image(
+                    (predictions.pred_invisible_masks.any(dim=0) > 0).numpy()
+                )
+            elif segm == 'pred_visible_masks':
+                assert predictions.has("pred_visible_masks"), "ColorMode.IMAGE_BW requires segmentations"
+                self.output.img = self._create_grayscale_image(
+                    (predictions.pred_visible_masks.any(dim=0) > 0).numpy()
+                )
             alpha = 0.3
 
         self.overlay_instances(
@@ -464,7 +482,7 @@ class Visualizer:
 
         return self.output
 
-    def draw_dataset_dict(self, dic):
+    def draw_dataset_dict(self, dic,segm='segmentation'):
         """
         Draw annotations/segmentaions in Detectron2 Dataset format.
 
@@ -476,10 +494,11 @@ class Visualizer:
         """
         annos = dic.get("annotations", None)
         if annos:
-            if "segmentation" in annos[0]:
-                masks = [x["segmentation"] for x in annos]
-            else:
+            dummy_mask = [[0,0,0,0,0,0]]
+            masks = [x[segm] if segm in x else dummy_mask  for x in annos]
+            if masks == []:
                 masks = None
+                
             if "keypoints" in annos[0]:
                 keypts = [x["keypoints"] for x in annos]
                 keypts = np.array(keypts).reshape(len(annos), -1, 3)

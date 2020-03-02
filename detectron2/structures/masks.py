@@ -23,7 +23,6 @@ def polygons_to_bitmask(polygons: List[np.ndarray], height: int, width: int) -> 
     Args:
         polygons (list[ndarray]): each array has shape (Nx2,)
         height, width (int)
-
     Returns:
         ndarray: a bool mask of shape (height, width)
     """

@@ -226,7 +226,7 @@ class AmodalMaskRCNNConvUpsampleHead(BaseMaskRCNNHead):
             return {"loss_amodal_mask": amodal_mask_rcnn_loss(x, instances, self.vis_period)},x
         else:
             amodal_mask_rcnn_inference(x, instances)
-            return instances
+            return instances,x
 
 def build_amodal_mask_head(cfg, input_shape):
     """

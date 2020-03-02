@@ -49,9 +49,17 @@ def invisible_mask_rcnn_loss(pred_mask_logits, instances, vis_period=0):
             gt_classes_per_image = instances_per_image.gt_classes.to(dtype=torch.int64)
             gt_classes.append(gt_classes_per_image)
 
-        gt_invisible_masks_per_image = instances_per_image.gt_i_masks.crop_and_resize(
+        # subtract amodal - visible to get gt occlusion mask 
+        gt_visible_masks_per_image = instances_per_image.gt_v_masks.crop_and_resize(
             instances_per_image.proposal_boxes.tensor, mask_side_len
         ).to(device=pred_mask_logits.device)
+        
+        gt_masks_per_image = instances_per_image.gt_masks.crop_and_resize(
+            instances_per_image.proposal_boxes.tensor, mask_side_len
+        ).to(device=pred_mask_logits.device)
+        # XOR
+        gt_invisible_masks_per_image = gt_masks_per_image^gt_visible_masks_per_image
+
         # A tensor of shape (N, M, M), N=#instances in the image; M=mask_side_len
         gt_invisible_masks.append(gt_invisible_masks_per_image)
 
@@ -136,7 +144,7 @@ def invisible_mask_rcnn_inference(pred_mask_logits, pred_instances):
     mask_probs_pred = mask_probs_pred.split(num_boxes_per_image, dim=0)
 
     for prob, instances in zip(mask_probs_pred, pred_instances):
-        instances.pred_occulusion_masks = prob  # (1, Hmask, Wmask)
+        instances.pred_invisible_masks = prob  # (1, Hmask, Wmask)
 
 @ROI_MASK_HEAD_REGISTRY.register()
 class InvisibleMaskRCNNHead(nn.Module):

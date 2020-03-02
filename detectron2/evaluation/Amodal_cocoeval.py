@@ -85,11 +85,7 @@ class AMODALCOCOeval (COCOeval):
             """
             t = coco.imgs[ann['image_id']]
             h, w = t['height'], t['width']
-            segm = anno.get("invisible_mask", None)
-            if segm:
-                segm = ann['invisible_mask']
-            else:
-                segm = [[0.0, 0.0, 0.0, 0.0, 0.0,0.0]]    
+            segm = ann.get("invisible_mask", None)  
             if type(segm) == list:
                 # polygon -- a single object might consist of multiple parts
                 # we merge all parts into one mask rle code
@@ -125,6 +121,9 @@ class AMODALCOCOeval (COCOeval):
             _toVisibleMask(gts, self.cocoGt)
             _toVisibleMask(dts, self.cocoDt)
         if p.iouType == 'invisible':
+            # remove segm does not have invisible mask in gts 
+            mygts = [gt for gt in gts if gt.get("invisible_mask", None)] 
+            gts = mygts
             _toInvisibleMask(gts, self.cocoGt)
             _toInvisibleMask(dts, self.cocoDt)
         
@@ -134,6 +133,7 @@ class AMODALCOCOeval (COCOeval):
             gt['ignore'] = 'iscrowd' in gt and gt['iscrowd']
             if p.iouType == 'keypoints':
                 gt['ignore'] = (gt['num_keypoints'] == 0) or gt['ignore']
+                
         self._gts = defaultdict(list)       # gt for evaluation
         self._dts = defaultdict(list)       # dt for evaluation
         for gt in gts:
@@ -321,7 +321,7 @@ class AmodalParams:
         self.kpt_oks_sigmas = np.array([.26, .25, .25, .35, .35, .79, .79, .72, .72, .62,.62, 1.07, 1.07, .87, .87, .89, .89])/10.0
 
     def __init__(self, iouType='segm'):
-        if iouType == 'segm' or iouType == 'bbox' or iouType == 'visible':
+        if iouType == 'segm' or iouType == 'bbox' or iouType == 'visible' or iouType == 'invisible':
             self.setDetParams()
         elif iouType == 'keypoints':
             self.setKpParams()

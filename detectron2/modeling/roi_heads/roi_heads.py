@@ -1005,11 +1005,13 @@ and the occlusion mask (occlusion mask head).
                 the same `Instances` objects, with extra
                 fields such as `pred_masks` or `pred_keypoints`. and 'pred_visible_masks'
         """
+        
         assert not self.training
         assert instances[0].has("pred_boxes") and instances[0].has("pred_classes")
         features_list = [features[f] for f in self.in_features]
-        instances = self._forward_amodal_mask(features_list, instances)
-        instances = self._forward_visible_mask(features_list, instances)
+        instances,amodal_mask_logits = self._forward_amodal_mask(features_list, instances)
+        instances,visible_mask_logits = self._forward_visible_mask(features_list, instances)
+        instances = self._forward_invisible_mask(amodal_mask_logits, visible_mask_logits, instances)
         return instances
         
         

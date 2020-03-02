@@ -52,6 +52,13 @@ def detector_postprocess(results, output_height, output_width, mask_threshold=0.
             results.image_size,
             threshold=mask_threshold,
         )
+    if results.has("pred_invisible_masks"):
+        results.pred_invisible_masks = paste_masks_in_image(
+            results.pred_invisible_masks[:, 0, :, :],  # N, 1, M, M
+            results.pred_boxes,
+            results.image_size,
+            threshold=mask_threshold,
+        )
 
     if results.has("pred_keypoints"):
         results.pred_keypoints[:, :, 0] *= scale_x

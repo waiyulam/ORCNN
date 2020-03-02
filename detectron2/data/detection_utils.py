@@ -307,8 +307,7 @@ def annotations_to_instances(annos, image_size, mask_format="polygon"):
             if "invisible_mask" in obj:
                 invisible.append(obj["invisible_mask"])
             else:
-                # fill in some dummy value for missing invisible mask
-                invisible.append([[0.0, 0.0, 0.0, 0.0, 0.0,0.0]])
+                invisible.append([[0.0,0.0,0.0,0.0,0.0,0.0]])
                 
         if mask_format == "polygon":
             # gt amodal masks per image 
