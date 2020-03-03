@@ -104,7 +104,7 @@ class AMODALCOCOeval (COCOeval):
             for ann in anns:
                 rle = invisibleToRLE(ann,coco)
                 ann['invisible_mask'] = rle
-    
+                
         p = self.params
         if p.useCats:
             gts=self.cocoGt.loadAnns(self.cocoGt.getAnnIds(imgIds=p.imgIds, catIds=p.catIds))
@@ -122,8 +122,9 @@ class AMODALCOCOeval (COCOeval):
             _toVisibleMask(dts, self.cocoDt)
         if p.iouType == 'invisible':
             # remove segm does not have invisible mask in gts 
-            mygts = [gt for gt in gts if gt.get("invisible_mask", None)] 
-            gts = mygts
+            my_occulued_gts = [gt for gt in gts if gt.get("invisible_mask", None) ] 
+            my_large_gts = [gt for gt in my_occulued_gts if gt['area'] > 5000 ]
+            gts = my_large_gts
             _toInvisibleMask(gts, self.cocoGt)
             _toInvisibleMask(dts, self.cocoDt)
         
