@@ -1,14 +1,17 @@
 # ORCNN in Detectron2 
+**Learning to See the Invisible: End-to-End Trainable Amodal Instance Segmentation**
+Waiyu Lam     
+Instructor: [Yong Jae Lee](https://web.cs.ucdavis.edu/~yjlee/)
+The amodal mask is defined as the union of the visible mask and the invisible
+occlusion mask of the object. Occlusion-aware RCNN propose an all-in-one, end to 
+end trainable multi-task model for semantic segmentation that simultaneously
+predicts amodal masks, visible masks, and occlusion masks for each
+object instance in an image in a single forward pass. 
 
-Detectron2 is Facebook AI Research's next generation software system
-that implements state-of-the-art object detection algorithms.
-It is a ground-up rewrite of the previous version,
-[Detectron](https://github.com/facebookresearch/Detectron/),
-and it originates from [maskrcnn-benchmark](https://github.com/facebookresearch/maskrcnn-benchmark/).
+On the COCO amodal dataset, our model outperforms the current baseline for amodal segmentation by a large margin.
 
-<div align="center">
-  <img src="https://user-images.githubusercontent.com/1381301/66535560-d3422200-eace-11e9-9123-5535d469db19.png"/>
-</div>
+
+In this repository, we provide the code to train and evaluate ORCNN. We also provide tools to visualize occlusion mask annotation and results.
 
 ### What's New
 * It is powered by the [PyTorch](https://pytorch.org) deep learning framework.
