@@ -1,8 +1,8 @@
 # ORCNN in Detectron2 
 **Learning to See the Invisible: End-to-End Trainable Amodal Instance
 Segmentation**    
-Waiyu Lam     
-Instructor: [Yong Jae Lee](https://web.cs.ucdavis.edu/~yjlee/)    
+*Waiyu Lam*
+*Instructor: [Yong Jae Lee](https://web.cs.ucdavis.edu/~yjlee/)* 
 
 Occlusion-aware RCNN propose an all-in-one, end to end trainable multi-task
 model for semantic segmentation that simultaneously predicts amodal masks,
@@ -22,18 +22,14 @@ Bench:
 In this repository, we provide the code to train and evaluate ORCNN. We also
 provide tools to visualize occlusion mask annotation and results.
 
-
 ## Installation
 
 See [INSTALL.md](INSTALL.md).
 
 ## Quick Start
 
-See [GETTING_STARTED.md](GETTING_STARTED.md), or the [Colab
-Notebook](https://colab.research.google.com/drive/16jcaJoc6bCFAQ96jDe2HwtXj7BMD_-m5).
+See [Getting Started ORCNN](https://github.com/waiyulam/ORCNN/blob/master/docs/tutorials/getting_started_orcnn.md)
 
-Learn more at our [documentation](https://detectron2.readthedocs.org). And see
-[projects/](projects/) for some projects that are built on top of detectron2.
 
 ## Model Zoo and Baselines
 
