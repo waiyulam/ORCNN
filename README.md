@@ -12,7 +12,9 @@ baseline for amodal segmentation by a large margin.
 
 The amodal mask is defined as the union of the visible mask and the invisible
 occlusion mask of the object.    
-Person: ![](https://github.com/waiyulam/ORCNN/blob/master/Results/amodal_mask/Person.png =100*100)   
+Person:
+<img src="https://github.com/waiyulam/ORCNN/blob/master/Results/amodal_mask/Person.png" alt="person" width="200"/>
+
 
 Bench: ![](https://github.com/waiyulam/ORCNN/blob/master/Results/amodal_mask/bench.png =100*100)
 
