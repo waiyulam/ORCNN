@@ -13,12 +13,10 @@ baseline for amodal segmentation by a large margin.
 The amodal mask is defined as the union of the visible mask and the invisible
 occlusion mask of the object.    
 Person: ![alt
-text](https://github.com/waiyulam/ORCNN/blob/master/Results/amodal_mask/Person.png 
-"Persons" | width=100)   
+text](https://github.com/waiyulam/ORCNN/blob/master/Results/amodal_mask/Person.png | width=100)   
 
 Bench: ![alt
-text](https://github.com/waiyulam/ORCNN/blob/master/Results/amodal_mask/bench.png
-"Bench" | width=100)
+text](https://github.com/waiyulam/ORCNN/blob/master/Results/amodal_mask/bench.png | width=100)
 
 In this repository, we provide the code to train and evaluate ORCNN. We also
 provide tools to visualize occlusion mask annotation and results.
