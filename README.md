@@ -12,7 +12,9 @@ The amodal mask is defined as the union of the visible mask and the invisible
 occlusion mask of the object.    
 Person: ![alt
 text](https://github.com/waiyulam/ORCNN/blob/master/Results/amodal_mask/Person.png
-"Persons") Bench: ![alt
+"Persons")   
+
+Bench: ![alt
 text](https://github.com/waiyulam/ORCNN/blob/master/Results/amodal_mask/Bench.png
 "Bench")
 
