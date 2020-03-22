@@ -15,7 +15,7 @@ text](https://github.com/waiyulam/ORCNN/blob/master/Results/amodal_mask/Person.p
 "Persons")   
 
 Bench: ![alt
-text](https://github.com/waiyulam/ORCNN/blob/master/Results/amodal_mask/Bench.png
+text](https://github.com/waiyulam/ORCNN/blob/master/Results/amodal_mask/bench.png
 "Bench")
 
 In this repository, we provide the code to train and evaluate ORCNN. We also
