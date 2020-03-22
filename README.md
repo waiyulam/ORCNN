@@ -27,15 +27,10 @@ provide tools to visualize occlusion mask annotation and results.
 See [INSTALL.md](INSTALL.md).
 
 ## Quick Start
-
-See [Getting Started ORCNN](https://github.com/waiyulam/ORCNN/blob/master/docs/tutorials/getting_started_orcnn.md)
-
-
-## Model Zoo and Baselines
-
-We provide a large set of baseline results and trained models available for
-download in the [Detectron2 Model Zoo](MODEL_ZOO.md).
-
+### Inference with Pre-trained Models
+See [Getting Started Amodal](https://github.com/waiyulam/ORCNN/blob/master/Amodal_demo.ipynb)
+### Training & Evaluation & Visualization
+See [Getting Started ORCNN](https://github.com/waiyulam/ORCNN/blob/master/ORCNN%20Training.ipynb)
 
 ## License
 
@@ -43,16 +38,22 @@ Detectron2 is released under the [Apache 2.0 license](LICENSE).
 
 ## Citing ORCNN
 
-If you use Detectron2 in your research or wish to refer to the baseline results
-published in the [Model Zoo](MODEL_ZOO.md), please use the following BibTeX
-entry.
-
 ```BibTeX
-@misc{wu2019detectron2,
-  author =       {Yuxin Wu and Alexander Kirillov and Francisco Massa and
-                  Wan-Yen Lo and Ross Girshick},
-  title =        {Detectron2},
-  howpublished = {\url{https://github.com/facebookresearch/detectron2}},
-  year =         {2019}
+@article{DBLP:journals/corr/abs-1804-08864,
+  author    = {Patrick Follmann and
+               Rebecca K{\"{o}}nig and
+               Philipp H{\"{a}}rtinger and
+               Michael Klostermann},
+  title     = {Learning to See the Invisible: End-to-End Trainable Amodal Instance
+               Segmentation},
+  journal   = {CoRR},
+  volume    = {abs/1804.08864},
+  year      = {2018},
+  url       = {http://arxiv.org/abs/1804.08864},
+  archivePrefix = {arXiv},
+  eprint    = {1804.08864},
+  timestamp = {Mon, 13 Aug 2018 16:46:01 +0200},
+  biburl    = {https://dblp.org/rec/journals/corr/abs-1804-08864.bib},
+  bibsource = {dblp computer science bibliography, https://dblp.org}
 }
 ```
