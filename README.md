@@ -1,3 +1,7 @@
+This is my own re-implementation model from ORCNN and only used for baseline model in our researching. The model is built based on the Dectectron2 and there is no official code that was used to obtain the results of the paper. Please reached the contact below if there is any concerns about the source code:<br>
+
+Email: waiyu0616@gmail.com 
+
 # ORCNN in Detectron2 
 **Learning to See the Invisible: End-to-End Trainable Amodal Instance
 Segmentation**    
@@ -38,22 +42,37 @@ Detectron2 is released under the [Apache 2.0 license](LICENSE).
 
 ## Citing ORCNN
 
-```BibTeX
-@article{DBLP:journals/corr/abs-1804-08864,
+```
+@inproceedings{follmann2019learning,
+
   author    = {Patrick Follmann and
+
                Rebecca K{\"{o}}nig and
+
                Philipp H{\"{a}}rtinger and
-               Michael Klostermann},
+
+               Michael Klostermann and
+
+               Tobias B{\"{o}}ttger},
+
   title     = {Learning to See the Invisible: End-to-End Trainable Amodal Instance
+
                Segmentation},
-  journal   = {CoRR},
-  volume    = {abs/1804.08864},
-  year      = {2018},
-  url       = {http://arxiv.org/abs/1804.08864},
-  archivePrefix = {arXiv},
-  eprint    = {1804.08864},
-  timestamp = {Mon, 13 Aug 2018 16:46:01 +0200},
-  biburl    = {https://dblp.org/rec/journals/corr/abs-1804-08864.bib},
-  bibsource = {dblp computer science bibliography, https://dblp.org}
+
+  booktitle = {{IEEE} Winter Conference on Applications of Computer Vision, {WACV}
+
+               2019, Waikoloa Village, HI, USA, January 7-11, 2019},
+
+  pages     = {1328--1336},
+
+  publisher = {{IEEE}},
+
+  year      = {2019},
+
+  url       = {https://doi.org/10.1109/WACV.2019.00146},
+
+  doi       = {10.1109/WACV.2019.00146},
 }
 ```
+
+
